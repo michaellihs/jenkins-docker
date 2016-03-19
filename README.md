@@ -5,9 +5,9 @@ This project brings a Jenkins Master running in a Docker container. The followin
 
 * Jenkins Master running in a container
 * Persisted configuration and jobs
-* Persisted Logs
+* Persisted logs
 
-The idea of the project is taken from the Blogpost [Putting Jenkins in a Docker Container](https://engineering.riotgames.com/news/putting-jenkins-docker-container) by Riot Games Engineering. All Kudos go to Maxfield F Stewart for providing this great blog post.
+The idea of the project is taken from the series of blog posts [Putting Jenkins in a Docker Container](https://engineering.riotgames.com/news/putting-jenkins-docker-container) by Riot Games Engineering. All Kudos go to Maxfield F Stewart for providing this great blog post.
 
 
 
@@ -27,22 +27,28 @@ These steps describe the setup on a Mac OS machine:
 
 
 
-Using the Docker Image
-----------------------
+Using the Docker Images
+-----------------------
 
-### Building the Docker Image
+This project contains several Docker files. One Dockerfile is used to start up a Jenkins master, another one starts volume containers that persist the data.
+
+### Building the Docker Images
 
 Run 
     
-    docker build -t myjenkins .
+    docker build -t myjenkins jenkins-master/.
+    docker build -t myjenkinsdata jenkins-data/.
+    docker build -t myjenkinsconf jenkins-conf/.
 
-to build the image
+to build the images
 
-### Starting the Docker Image
+### Starting the Docker Images
 
 Run 
-   
-    docker run -p 8080:8080 --name=jenkins-master -d myjenkins
+
+    docker run --name=jenkins-data myjenkinsdata
+    docker run --name=jenkins-conf myjenkinsconf
+    docker run -p 8080:8080 -p 50000:50000 --name=jenkins-master --volumes-from=jenkins-data --volumes-from=jenkins-conf -d myjenkins
 
 to start the container. Jenkins should now be available at http://192.168.99.100:8080
 
@@ -52,7 +58,11 @@ to start the container. Jenkins should now be available at http://192.168.99.100
 Run 
 
     docker stop jenkins-master
+    docker stop jenkins-data
+    docker stop jenkins-conf
     docker rm jenkins-master
+    docker rm jenkins-data
+    docker rm jenkins-conf
 
 ### Accessing the Jenkins Logfiles inside the Container
 
@@ -79,11 +89,16 @@ Q: When I try to run a Docker command, I get `Network timed out while trying to 
 A: Restart your Docker-machine with `docker-machine restart` to re-configure networking.
 
 
+
 Resources
 =========
 
+* [Official Jenkins Image on Dockerhub](https://hub.docker.com/_/jenkins/)
 * [Putting Jenkins in a Docker Container](https://engineering.riotgames.com/news/putting-jenkins-docker-container) by Riot Games Engineering
 * [Docker & Jenkins - Data that persists](https://engineering.riotgames.com/news/docker-jenkins-data-persists) by Riot Games Engineering
+* [Jenkins, Docker, Proxies and Compose](https://engineering.riotgames.com/news/jenkins-docker-proxies-and-compose) by Riot Games Engineering
+* [Taking Control of your Docker Image](https://engineering.riotgames.com/news/taking-control-your-docker-image) by Riot Games Engineering
+* [Understanding Volumes in Docker](http://container-solutions.com/understanding-volumes-docker/)
 
 
 

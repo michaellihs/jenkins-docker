@@ -7,9 +7,11 @@ MAINTAINER Michael Lihs <mimi@kaktusteam.de>
 # Create Jenkins Log Folder
 USER root
 RUN mkdir /var/log/jenkins
+RUN mkdir /var/cache/jenkins
 RUN chown -R jenkins:jenkins /var/log/jenkins
+RUN chown -R jenkins:jenkins /var/cache/jenkins
 USER jenkins
 
 # Set Java and Jenkins ENV variables
 ENV JAVA_OPTS="-Xmx1024m"
-ENV JENKINS_OPTS="--handlerCountStartup=100 --handlerCountMax=300 --logfile=/var/log/jenkins/jenkins.log"
+ENV JENKINS_OPTS="--handlerCountStartup=100 --handlerCountMax=300 --logfile=/var/log/jenkins/jenkins.log --webroot=/var/cache/jenkins/war"
